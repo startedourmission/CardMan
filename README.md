@@ -27,7 +27,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 3. 프로젝트 클론
 ```bash
 git clone <repository-url>
-cd appleman/messageman
+cd CardMan
 ```
 
 ## 실행 방법
@@ -35,13 +35,13 @@ cd appleman/messageman
 ### 메뉴바 앱 실행
 
 ```bash
-uv run ./messageman/menubar_app.py
+uv run menubar_app.py
 ```
 
 ### 상세 분석 앱 실행
 
 ```bash
-uv run ./messageman/app.py
+uv run app.py
 ```
 
 **Tip:** 메뉴바 앱의 '카드맨' 메뉴를 클릭하면 상세 앱이 자동으로 실행됩니다.
@@ -161,7 +161,7 @@ SMS로 오지 않는 거래(현금 결제 등)를 직접 입력:
 
 ### 프로젝트 구조
 ```
-messageman/
+root/
 ├── menubar_app.py          # 메뉴바 위젯 메인 파일
 ├── app.py                  # 상세 분석 앱 메인 파일
 ├── config.py               # 설정 및 데이터 관리
