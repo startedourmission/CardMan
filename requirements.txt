@@ -2,3 +2,4 @@
 # tkinter is included in Python standard library
 
 pandas>=2.0.0
+rumps>=0.4.0

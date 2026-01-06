@@ -32,6 +32,11 @@ cd CardMan
 
 ## 실행 방법
 
+```bash
+nohup python main.py > output.log 2>&1 &
+```
+
+
 ### 메뉴바 앱 실행
 
 ```bash
