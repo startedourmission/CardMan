@@ -6,7 +6,7 @@ import re
 from datetime import datetime
 import os
 from pathlib import Path
-from config import load_config, save_config, load_manual_transactions, add_manual_transaction
+from config import load_config, save_config, load_manual_transactions, add_manual_transaction, delete_manual_transaction
 
 def decode_message(row):
     msg_text = row['text']
@@ -157,9 +157,13 @@ class MessageAnalyzerApp:
         self.manual_btn = ttk.Button(bottom_frame, text="거래 수동 추가", command=self.add_manual_transaction_dialog)
         self.manual_btn.grid(row=0, column=4, rowspan=2, padx=5)
 
+        # 수동 거래 관리 버튼
+        self.manage_manual_btn = ttk.Button(bottom_frame, text="수동 거래 관리", command=self.manage_manual_transactions_dialog)
+        self.manage_manual_btn.grid(row=0, column=5, rowspan=2, padx=5)
+
         # 상태 표시
         self.status_label = ttk.Label(bottom_frame, text="연간 예산과 전화번호를 입력하고 '분석 시작'을 클릭하세요")
-        self.status_label.grid(row=0, column=5, rowspan=2, sticky=tk.W, padx=10)
+        self.status_label.grid(row=0, column=6, rowspan=2, sticky=tk.W, padx=10)
 
         # 앱 시작시 자동으로 분석 실행
         self.root.after(100, self.analyze_messages)
@@ -507,6 +511,61 @@ class MessageAnalyzerApp:
 
         ttk.Button(button_frame, text="추가", command=save_transaction).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="취소", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
+
+    def manage_manual_transactions_dialog(self):
+        """수동 거래 관리 다이얼로그"""
+        dialog = tk.Toplevel(self.root)
+        dialog.title("수동 거래 관리")
+        dialog.geometry("600x400")
+
+        # 리스트박스와 스크롤바
+        frame = ttk.Frame(dialog)
+        frame.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
+
+        scrollbar = ttk.Scrollbar(frame)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        listbox = tk.Listbox(frame, yscrollcommand=scrollbar.set, font=('Arial', 11))
+        listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=listbox.yview)
+
+        # 수동 거래 내역 로드
+        def load_transactions():
+            listbox.delete(0, tk.END)
+            transactions = load_manual_transactions()
+            for i, trans in enumerate(transactions):
+                date = trans['date'][:10] if len(trans['date']) > 10 else trans['date']
+                text = f"{date} | {trans['amount']:,}원 | {trans['merchant']}"
+                listbox.insert(tk.END, text)
+
+        load_transactions()
+
+        # 삭제 기능
+        def delete_selected():
+            selection = listbox.curselection()
+            if not selection:
+                messagebox.showwarning("경고", "삭제할 항목을 선택해주세요")
+                return
+
+            index = selection[0]
+            transactions = load_manual_transactions()
+            if 0 <= index < len(transactions):
+                merchant = transactions[index]['merchant']
+                if messagebox.askyesno("확인", f"{merchant} 거래를 삭제하시겠습니까?"):
+                    if delete_manual_transaction(index):
+                        load_transactions()
+                        # 자동으로 다시 분석
+                        self.analyze_messages()
+                        messagebox.showinfo("완료", "거래가 삭제되었습니다")
+                    else:
+                        messagebox.showerror("오류", "삭제에 실패했습니다")
+
+        # 버튼 프레임
+        button_frame = ttk.Frame(dialog)
+        button_frame.pack(fill=tk.X, padx=20, pady=10)
+
+        ttk.Button(button_frame, text="삭제", command=delete_selected).pack(side=tk.LEFT, padx=5)
+        ttk.Button(button_frame, text="닫기", command=dialog.destroy).pack(side=tk.LEFT, padx=5)
 
     def export_csv(self):
         """CSV 파일 내보내기"""

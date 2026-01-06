@@ -63,3 +63,11 @@ def add_manual_transaction(date_str, amount, merchant, currency='KRW'):
 
     transactions.append(new_transaction)
     return save_manual_transactions(transactions)
+
+def delete_manual_transaction(index):
+    """수동 거래 삭제"""
+    transactions = load_manual_transactions()
+    if 0 <= index < len(transactions):
+        transactions.pop(index)
+        return save_manual_transactions(transactions)
+    return False
