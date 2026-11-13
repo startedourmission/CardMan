@@ -137,5 +137,6 @@ Thumbs.db
 *.db
 CardMan.app/
 
-# npx skills 설치 기록 (스킬 폴더 .claude/ 는 루트 .gitignore에서 무시)
+# npx skills로 설치한 스킬과 설치 기록
+.claude/
 skills-lock.json

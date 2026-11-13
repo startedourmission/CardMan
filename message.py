@@ -32,7 +32,6 @@ from pathlib import Path
 
 path = Path.home() / "Library" / "Messages" / "chat.db"
 
-# substitute username with your username
 conn = sqlite3.connect(path)
 # connect to the database
 phone_number = "+8215881688"  # 원하는 전화번호로 변경
