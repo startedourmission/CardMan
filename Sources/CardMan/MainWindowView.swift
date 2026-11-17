@@ -329,6 +329,13 @@ private struct ExclusionCell: View {
     let transaction: CardManCore.Transaction
     let isSelected: Bool
     @State private var editing = false
+    /// 선택된 줄이 파란 배경으로 강조되면 .increased
+    @Environment(\.backgroundProminence) private var prominence
+
+    /// 파란 선택 배경 위에서는 흰색, 그 밖에는 강조색
+    private var linkColor: Color {
+        prominence == .increased ? .white : .cardManAccent
+    }
 
     var body: some View {
         let exclusion = model.exclusion(for: transaction)
@@ -343,13 +350,13 @@ private struct ExclusionCell: View {
             if case .partial(let amount) = exclusion {
                 Button("−\(Format.won(amount))") { editing = true }
                     .buttonStyle(.plain)
-                    .foregroundStyle(Color.cardManAccent)
+                    .foregroundStyle(linkColor)
                     .monospacedDigit()
                     .help("일부 제외 금액 바꾸기")
             } else if isSelected && exclusion == nil {
                 Button("일부만 제외") { editing = true }
                     .buttonStyle(.plain)
-                    .foregroundStyle(Color.cardManAccent)
+                    .foregroundStyle(linkColor)
             }
             Spacer(minLength: 0)
         }
